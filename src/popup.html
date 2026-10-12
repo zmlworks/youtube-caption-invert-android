@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>字幕の色を反転（Android）</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Noto Sans JP", "Roboto", sans-serif;
+      }
+      body {
+        margin: 0;
+        min-width: 300px;
+        background: #141311;
+        color: #f3efe6;
+        font-size: 17px;
+      }
+      main {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 56px;
+        padding: 0 14px;
+        border: 1px solid #3a342c;
+        border-radius: 12px;
+        background: #1e1c19;
+      }
+      .card.big {
+        min-height: 64px;
+        font-size: 19px;
+        font-weight: 700;
+      }
+      fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      legend {
+        padding: 0;
+        margin-bottom: 6px;
+        font-size: 14px;
+        color: #c9c2b6;
+      }
+      fieldset label {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-height: 56px;
+        padding: 0 14px;
+        border: 1px solid #3a342c;
+        border-radius: 12px;
+        background: #1e1c19;
+      }
+      fieldset label.is-checked {
+        border-color: #ff4d2e;
+        border-width: 2px;
+      }
+      input[type="radio"],
+      input[type="checkbox"]:not(.switch) {
+        width: 24px;
+        height: 24px;
+        margin: 0;
+        accent-color: #ff4d2e;
+      }
+      select {
+        min-height: 44px;
+        min-width: 150px;
+        background: #141311;
+        color: #f3efe6;
+        border: 1px solid #3a342c;
+        border-radius: 10px;
+        font: inherit;
+        padding: 0 10px;
+      }
+      .switch {
+        appearance: none;
+        width: 60px;
+        height: 34px;
+        margin: 0;
+        border-radius: 17px;
+        background: #3a342c;
+        position: relative;
+        flex: none;
+      }
+      .switch::after {
+        content: "";
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #f3efe6;
+        top: 3px;
+        left: 3px;
+      }
+      .switch:checked {
+        background: #ff4d2e;
+      }
+      .switch:checked::after {
+        left: 29px;
+      }
+      .hint {
+        margin: 0;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #22201c;
+        color: #c9c2b6;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .hint b {
+        color: #f3efe6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>字幕の色を反転</h1>
+      <label class="card big">
+        <span>オン</span>
+        <input id="enabled" class="switch" type="checkbox" />
+      </label>
+      <p class="hint">字幕を<b>タップ</b>すると <b>反転 → 二重フチ → OFF</b> と切り替わります（このページだけ）。OFF のあとは、ページを再読み込みすると元に戻ります。</p>
+      <fieldset>
+        <legend>動作（最初の状態）</legend>
+        <label><input type="radio" name="mode" value="invert" /> <span>反転</span></label>
+        <label><input type="radio" name="mode" value="stroke" /> <span>反転 + 輪郭</span></label>
+        <label><input type="radio" name="mode" value="edge" /> <span>二重フチ</span></label>
+      </fieldset>
+      <label class="card">
+        <span>字幕サイズ</span>
+        <select id="fontPct">
+          <option value="50">50%</option>
+          <option value="75">75%</option>
+          <option value="100">100%（標準）</option>
+          <option value="150">150%</option>
+          <option value="200">200%</option>
+          <option value="300">300%</option>
+          <option value="400">400%</option>
+        </select>
+      </label>
+      <label class="card">
+        <span>字幕の高さ</span>
+        <select id="capPos">
+          <option value="1">1（YouTube標準）</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10（いちばん上）</option>
+        </select>
+      </label>
+      <label class="card">
+        <span>中央に寄せる</span>
+        <input id="center" type="checkbox" />
+      </label>
+      <label class="card">
+        <span>輪郭の太さ</span>
+        <select id="strokeWidth">
+          <option value="0">0 px</option>
+          <option value="1">1 px</option>
+          <option value="2">2 px</option>
+          <option value="3">3 px</option>
+          <option value="4">4 px</option>
+          <option value="6">6 px</option>
+        </select>
+      </label>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

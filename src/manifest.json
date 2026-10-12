@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "android test YouTube inverted color subtitle",
+  "version": "2.5.0",
+  "description": "YouTube字幕を、色反転、輪郭つきの色反転、二重フチで読みやすくします。",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "android.youtube.inverted.color.subtitle@kofu.com",
+      "strict_min_version": "120.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "120.0"
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.youtube-nocookie.com/*"
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "96": "icon96.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_title": "字幕の色を反転",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon48.png",
+      "96": "icon96.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "invert.css"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
+}

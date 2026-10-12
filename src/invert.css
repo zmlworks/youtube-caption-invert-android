@@ -1,0 +1,192 @@
+/* 中央なしの反転・輪郭は元の字幕へ足す。中央寄せと二重フチは元の見た目を消して描き直す。 */
+/* 2.4.0: 字幕サイズ用の規則と、軽くした「映像を別レイヤー」の規則を追加。 2.4.1: 反転の合成を字幕の入れ物へ移動。 2.4.2: ロールアップ字幕の拡大と中央寄せを YouTube の計測と両立する方式に変更。 2.4.3: 字幕の高さを追加。 */
+
+html.ytic-on .ytp-caption-window-container,
+html.ytic-on .caption-window,
+html.ytic-on .captions-text,
+html.ytic-on .caption-visual-line,
+html.ytic-on .ytp-caption-segment,
+html.ytic-on .ytp-caption-segment * {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  filter: none !important;
+}
+
+/* 映像を別レイヤー: 反転（差の合成）を使うモードで、字幕が出ている間だけ映像を独立レイヤーにする。
+   ytic-cc-live は content.js がプレーヤー要素に付け外しする（字幕が 15 秒出なければ外す）。
+   backface-visibility は Firefox では効果がなく、余計な合成面を作ることがあるので外した。 */
+html.ytic-on:not(.ytic-mode-edge) .ytic-cc-live .html5-main-video {
+  will-change: transform;
+}
+
+/* 2.4.1: 差の合成（反転）は字幕の入れ物で 1 回だけ行う。
+   字幕の枠ごとに合成すると、投稿者が同じ字幕を同じ位置に 2 枚重ねている動画（影＋縁取りの重ね技）で
+   反転が 2 回かかって元に戻り、字幕が透明に見えていた。枠どうしは普通に重ねてから 1 回だけ反転する。 */
+html.ytic-native .ytp-caption-window-container,
+html.ytic-own.ytic-invert .ytp-caption-window-container,
+html.ytic-own.ytic-stroke .ytp-caption-window-container {
+  /* 合成を付けると入れ物が重なり順の単位になる。YouTube は字幕の枠に z-index:41、映像に z-index:10 を
+     付けているので、入れ物にも 41 を付けないと字幕が映像の下に隠れる。 */
+  z-index: 41 !important;
+  opacity: 1 !important;
+  isolation: auto !important;
+  backdrop-filter: none !important;
+  mix-blend-mode: difference !important;
+}
+
+html.ytic-native .caption-window {
+  opacity: 1 !important;
+  isolation: auto !important;
+  backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+html.ytic-native .ytp-caption-segment,
+html.ytic-native .ytp-caption-segment * {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 transparent !important;
+  mix-blend-mode: normal !important;
+  font-weight: var(--ytic-weight, 700) !important;
+}
+
+html.ytic-native.ytic-stroke .ytp-caption-segment,
+html.ytic-native.ytic-stroke .ytp-caption-segment * {
+  -webkit-text-stroke: var(--ytic-stroke-width, 2px) rgb(128, 128, 128) !important;
+  paint-order: stroke fill !important;
+}
+
+html.ytic-own .ytp-caption-window-container,
+html.ytic-own .caption-window {
+  opacity: 1 !important;
+  isolation: auto !important;
+  backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+html.ytic-own .ytp-caption-segment,
+html.ytic-own .ytp-caption-segment * {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 transparent !important;
+  mix-blend-mode: normal !important;
+  font-weight: var(--ytic-weight, 700) !important;
+}
+
+html.ytic-own.ytic-mode-edge .ytp-caption-segment,
+html.ytic-own.ytic-mode-edge .ytp-caption-segment * {
+  color: var(--ytic-fill, #fff) !important;
+  -webkit-text-fill-color: var(--ytic-fill, #fff) !important;
+  text-shadow: var(--ytic-rim) !important;
+}
+
+
+html.ytic-own.ytic-invert .ytp-caption-segment,
+html.ytic-own.ytic-invert .ytp-caption-segment *,
+html.ytic-own.ytic-stroke .ytp-caption-segment,
+html.ytic-own.ytic-stroke .ytp-caption-segment * {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+html.ytic-own.ytic-stroke .ytp-caption-segment,
+html.ytic-own.ytic-stroke .ytp-caption-segment * {
+  -webkit-text-stroke: var(--ytic-stroke-width, 2px) rgb(128, 128, 128) !important;
+  paint-order: stroke fill !important;
+}
+
+/* 中央に寄せる（2.4.2 で変更）。
+   以前は left:50% + transform で寄せていたが、YouTube は字幕を描くたびに一度 left:0・幅なしで並べて
+   文字の幅と行の高さを測る。left:50% を強制すると測るときの幅が半分になり、長い行が余計に折り返された
+   高さで計算され、ロールアップ字幕が上がりすぎたり戻ったりしていた。
+   左右を 0 にして左右の余白を auto にすれば、測るときの幅は YouTube の想定どおりのまま中央に置ける。
+   transform は使わない（YouTube 自身の transform を消さない）。 */
+html[data-ytic-center="1"] .caption-window {
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
+/* YouTube が幅を書いていない枠（測っている途中など）は中身の幅にする。そうしないと左右 0 で全幅になる。 */
+html[data-ytic-center="1"] .caption-window:not([style^="width:"]):not([style*=" width:"]) {
+  width: fit-content !important;
+  max-width: 96% !important;
+}
+
+/* YouTube が translateX(-50%) で中央に置いている枠は、その分を打ち消す（二重に寄らないように）。 */
+html[data-ytic-center="1"] .caption-window[style*="translateX(-50%)"] {
+  translate: 50% 0 !important;
+}
+
+html[data-ytic-center="1"] .ytp-caption-segment,
+html[data-ytic-center="1"] .caption-visual-line {
+  text-align: center !important;
+}
+
+/* 字幕サイズ（YouTube の「フォント サイズ」と同じ倍率）。
+   ・ロールアップ字幕（.ytp-caption-window-rollup）: content.js が入れ物に --ytic-rf を書き、ここで文字サイズを
+     置き換える。YouTube が行の高さ・幅を測る時点で既に大きいので、YouTube の枠の高さ・流す量・アニメーションが
+     そのまま正しく働く。枠の高さや overflow には触らない。幅を測るための「–」の並び（captions-text 直下の span）も同じ大きさにする。
+   ・それ以外の字幕: content.js が各 .ytp-caption-segment に !important で書く。ここでは枠（YouTube が固定の高さと
+     overflow:hidden を書く）を文字に合わせて広げ、画面からはみ出さないよう幅を抑え、中央の字幕は中央のまま保つ。 */
+html.ytic-on.ytic-scaled .ytic-rf .ytp-caption-window-rollup .ytp-caption-segment,
+html.ytic-on.ytic-scaled .ytic-rf .ytp-caption-window-rollup .captions-text > span:not(.caption-visual-line) {
+  font-size: var(--ytic-rf) !important;
+}
+
+html.ytic-on.ytic-scaled .caption-window:not(.ytp-caption-window-rollup) {
+  height: auto !important;
+  max-width: 96% !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+html.ytic-on.ytic-scaled .caption-window:not(.ytp-caption-window-rollup).ytp-caption-window-bottom[style*="margin-left"],
+html.ytic-on.ytic-scaled .caption-window:not(.ytp-caption-window-rollup).ytp-caption-window-top[style*="margin-left"] {
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 字幕の高さ（2.4.3）。1 = YouTube 標準（この規則は効かない）、2〜10 = 下から上へ。
+   ・対象は YouTube が標準の位置に置いた枠だけ（インラインに bottom: 2% がある下寄せの枠。通常の字幕も
+     自動生成のロールアップ字幕もこの位置）。投稿者が位置を指定した字幕（srv3 の wp）と、ユーザーが
+     ドラッグした字幕は bottom が 2% 以外になるので動かさない。ドラッグすると、その時点の表示位置から
+     YouTube の位置指定に切り替わる。次の動画では再びこの設定の位置から始まる。
+   ・YouTube が字幕を測るとき（top:0・bottom なし）には効かないので、ロールアップの計算は変わらない。
+     高さ・幅・transform には触らず、bottom / top だけを変える。
+   ・2〜5 は下端の位置（bottom）を指定。YouTube の操作バー回避（margin-bottom）はそのまま働く。
+   ・6〜10 は上端の位置（top）を指定し、下へ伸びるので上にはみ出さない。操作バーが出ても動かない。 */
+html.ytic-on[data-ytic-pos="2"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: 12% !important; }
+html.ytic-on[data-ytic-pos="3"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: 22% !important; }
+html.ytic-on[data-ytic-pos="4"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: 32% !important; }
+html.ytic-on[data-ytic-pos="5"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: 42% !important; }
+html.ytic-on[data-ytic-pos="6"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: auto !important; top: 42% !important; }
+html.ytic-on[data-ytic-pos="7"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: auto !important; top: 32% !important; }
+html.ytic-on[data-ytic-pos="8"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: auto !important; top: 22% !important; }
+html.ytic-on[data-ytic-pos="9"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: auto !important; top: 12% !important; }
+html.ytic-on[data-ytic-pos="10"] .caption-window.ytp-caption-window-bottom[style*="bottom: 2%"] { bottom: auto !important; top: 2% !important; }
+
+/* Android 版: 字幕タップで切り替えたときの短い表示（約 0.8 秒）。タップを邪魔しないよう pointer-events:none。 */
+.ytic-toast {
+  position: absolute;
+  z-index: 2147483647;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font: 700 16px/1.4 "Roboto", "Noto Sans JP", sans-serif;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+.ytic-toast.ytic-toast-hide {
+  opacity: 0;
+}
