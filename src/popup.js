@@ -23,6 +23,9 @@ const TEXT_EN = {
   size100: "100% (default)",
   pos1: "1 (YouTube default)",
   pos10: "10 (top)",
+  edgeColors: "Double edge colors",
+  fillName: "Text & outer",
+  midName: "Inner",
 };
 if (LANG === "en") {
   document.documentElement.lang = "en";
@@ -35,6 +38,39 @@ if (LANG === "en") {
 
 const MODES = ["invert", "stroke", "edge"];
 const FONT_STEPS = [50, 75, 100, 150, 200, 300, 400];
+const DEFAULT_FILL = [12, 39, 80];
+const DEFAULT_MID = [205, 225, 255];
+const rgbInputs = {
+  fill: ["fillR", "fillG", "fillB"].map((id) => document.getElementById(id)),
+  mid: ["midR", "midG", "midB"].map((id) => document.getElementById(id)),
+};
+
+function normChannel(value, fallback) {
+  const n = Number(value);
+  if (value === "" || value === null || value === undefined || !Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.min(255, Math.round(n)));
+}
+
+function normRgb(value, fallback) {
+  const src = Array.isArray(value) ? value : [];
+  return [0, 1, 2].map((i) => normChannel(src[i], fallback[i]));
+}
+
+function readRgb(key, fallback) {
+  // 入力は 0〜255 に丸め、丸めた値を入力欄にも戻す
+  const rgb = rgbInputs[key].map((input, i) => normChannel(input.value, fallback[i]));
+  rgbInputs[key].forEach((input, i) => (input.value = String(rgb[i])));
+  return rgb;
+}
+
+function paintSwatches() {
+  ["fill", "mid"].forEach((key) => {
+    const fb = key === "fill" ? DEFAULT_FILL : DEFAULT_MID;
+    const rgb = rgbInputs[key].map((input, i) => normChannel(input.value, fb[i]));
+    document.getElementById(key + "Swatch").style.background = "rgb(" + rgb.join(" ") + ")";
+  });
+}
+
 const WIDTH_STEPS = [0, 1, 2, 3, 4, 6];
 const modeInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="mode"]'));
 const enabled = document.getElementById("enabled");
@@ -81,6 +117,8 @@ function read(data) {
     strokeWidth: androidFresh ? 1 : normWidth(data.strokeWidth),
     fontPct: normPct(data.fontPct),
     capPos: androidFresh ? 2 : normPos(data.capPos),
+    fill: normRgb(data.fill, DEFAULT_FILL),
+    mid: data.settingsRev !== 1 ? DEFAULT_MID.slice() : normRgb(data.mid, DEFAULT_MID),
   };
 }
 
@@ -102,6 +140,9 @@ function paint(data) {
   // 一覧にない太さ（デスクトップ版で 5px など）は近い値を表示する
   const w = next.strokeWidth;
   strokeWidth.value = String(WIDTH_STEPS.reduce((best, s) => (Math.abs(s - w) < Math.abs(best - w) ? s : best), 1));
+  rgbInputs.fill.forEach((input, i) => (input.value = String(next.fill[i])));
+  rgbInputs.mid.forEach((input, i) => (input.value = String(next.mid[i])));
+  paintSwatches();
   syncModeLabels();
 }
 
@@ -115,6 +156,9 @@ function save() {
       fontPct: normPct(fontPct.value),
       capPos: normPos(capPos.value),
       strokeWidth: normWidth(strokeWidth.value),
+      fill: readRgb("fill", DEFAULT_FILL),
+      mid: readRgb("mid", DEFAULT_MID),
+      edgeCustom: true,
       settingsRev: 1,
       androidRev: 1,
     },
@@ -130,6 +174,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 [enabled, center, fontPct, capPos, strokeWidth].forEach((el) => el.addEventListener("change", () => save()));
+rgbInputs.fill.concat(rgbInputs.mid).forEach((el) => {
+  el.addEventListener("input", paintSwatches);
+  el.addEventListener("change", () => save());
+});
 modeInputs.forEach((input) => {
   input.addEventListener("change", () => {
     syncModeLabels();

@@ -1,4 +1,4 @@
-/* 字幕の色を反転 Android 版 2.5.1（デスクトップ版 2.4.3 から分岐）
+/* 字幕の色を反転 Android 版 2.6.0（デスクトップ版 2.4.3 から分岐）
  * - 字幕をタップすると「反転 → 反転+輪郭 →（高さを標準へ）→ 二重フチ → OFF」と切り替わる（このページだけ。再読み込みで保存した設定に戻る）。
  * - 反転 / 反転+輪郭 / 二重フチ は CSS（invert.css）で描く。ここではクラスと CSS 変数を切り替えるだけ。
  * - 字幕サイズ: YouTube は .ytp-caption-segment のインライン style に font-size を書き、
@@ -24,8 +24,8 @@
   const path = location.pathname || "";
   if (isTop ? /^\/live_chat/.test(path) : !/^\/embed\//.test(path)) return;
 
-  if (root.dataset.yticExt === "a251") return;
-  root.dataset.yticExt = "a251";
+  if (root.dataset.yticExt === "a260") return;
+  root.dataset.yticExt = "a260";
 
   const MODES = ["invert", "stroke", "edge"];
   const FONT_STEPS = [50, 75, 100, 150, 200, 300, 400];
@@ -219,7 +219,8 @@
     const on = mode !== "off";
     const centerOn = on && state.center === true;
     const native = on && !centerOn && (mode === "invert" || mode === "stroke");
-    const custom = mode === "edge" && state.edgeCustom;
+    // Android 版では二重フチの色は常に保存した RGB（初期値は青のプリセット）を使う。
+    const custom = mode === "edge";
     const fill = custom ? cssRgb(state.fill) : "#fff";
     const inner = custom ? cssRgb(state.mid) : "#000";
     const outer = custom ? cssRgb(state.fill) : "#fff";

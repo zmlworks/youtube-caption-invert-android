@@ -125,7 +125,54 @@
         font-size: 15px;
         line-height: 1.5;
       }
-          </style>
+      
+      .colors-title {
+        margin: 4px 0 0;
+        font-size: 14px;
+        color: #c9c2b6;
+      }
+      .rgb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 56px;
+        padding: 6px 12px;
+        border: 1px solid #3a342c;
+        border-radius: 12px;
+        background: #1e1c19;
+        flex-wrap: wrap;
+      }
+      .rgb .row-name {
+        flex: 1 0 100%;
+        font-size: 14px;
+        color: #c9c2b6;
+      }
+      .rgb label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 15px;
+      }
+      .rgb input {
+        width: 58px;
+        min-height: 44px;
+        box-sizing: border-box;
+        background: #141311;
+        color: #f3efe6;
+        border: 1px solid #3a342c;
+        border-radius: 10px;
+        font: inherit;
+        text-align: center;
+      }
+      .swatch {
+        width: 36px;
+        height: 36px;
+        margin-left: auto;
+        border-radius: 8px;
+        border: 1px solid #6a6258;
+        flex: none;
+      }
+    </style>
   </head>
   <body>
     <main>
@@ -183,6 +230,21 @@
           <option value="6">6 px</option>
         </select>
       </label>
+      <p class="colors-title" data-i18n="edgeColors">二重フチの色</p>
+      <div class="rgb">
+        <span class="row-name" data-i18n="fillName">文字と外側</span>
+        <label>R <input id="fillR" type="number" inputmode="numeric" min="0" max="255" step="1" value="12" /></label>
+        <label>G <input id="fillG" type="number" inputmode="numeric" min="0" max="255" step="1" value="39" /></label>
+        <label>B <input id="fillB" type="number" inputmode="numeric" min="0" max="255" step="1" value="80" /></label>
+        <span class="swatch" id="fillSwatch"></span>
+      </div>
+      <div class="rgb">
+        <span class="row-name" data-i18n="midName">内側</span>
+        <label>R <input id="midR" type="number" inputmode="numeric" min="0" max="255" step="1" value="205" /></label>
+        <label>G <input id="midG" type="number" inputmode="numeric" min="0" max="255" step="1" value="225" /></label>
+        <label>B <input id="midB" type="number" inputmode="numeric" min="0" max="255" step="1" value="255" /></label>
+        <span class="swatch" id="midSwatch"></span>
+      </div>
     </main>
     <script src="popup.js"></script>
   </body>
