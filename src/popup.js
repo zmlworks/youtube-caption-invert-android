@@ -1,5 +1,38 @@
 /* 字幕の色を反転（Android 版）ポップアップ。項目を絞り、指で押しやすくしたもの。
    ここで扱わない設定（文字の太さ・二重フチの色など）は保存済みの値をそのまま残す。 */
+// 表示言語は Firefox の言語に従う（ja で始まれば日本語、それ以外は英語）。切り替えボタンはない。
+const LANG = (() => {
+  try {
+    return /^ja/i.test(chrome.i18n.getUILanguage()) ? "ja" : "en";
+  } catch (e) {
+    return /^ja/i.test(navigator.language || "") ? "ja" : "en";
+  }
+})();
+const TEXT_EN = {
+  title: "Inverted subtitles",
+  on: "On",
+  hint: "Tap a caption to switch modes; it eventually turns off. Reload the page to turn it back on.",
+  mode: "Mode",
+  invert: "Invert",
+  stroke: "Invert + outline",
+  edge: "Double edge",
+  size: "Caption size",
+  height: "Caption height",
+  center: "Center captions",
+  width: "Outline width",
+  size100: "100% (default)",
+  pos1: "1 (YouTube default)",
+  pos10: "10 (top)",
+};
+if (LANG === "en") {
+  document.documentElement.lang = "en";
+  document.title = TEXT_EN.title;
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const t = TEXT_EN[el.getAttribute("data-i18n")];
+    if (t) el.textContent = t;
+  });
+}
+
 const MODES = ["invert", "stroke", "edge"];
 const FONT_STEPS = [50, 75, 100, 150, 200, 300, 400];
 const WIDTH_STEPS = [0, 1, 2, 3, 4, 6];

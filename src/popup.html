@@ -125,31 +125,28 @@
         font-size: 15px;
         line-height: 1.5;
       }
-      .hint b {
-        color: #f3efe6;
-      }
-    </style>
+          </style>
   </head>
   <body>
     <main>
-      <h1>字幕の色を反転</h1>
+      <h1 data-i18n="title">字幕の色を反転</h1>
       <label class="card big">
-        <span>オン</span>
+        <span data-i18n="on">オン</span>
         <input id="enabled" class="switch" type="checkbox" />
       </label>
-      <p class="hint">字幕を<b>タップ</b>すると <b>反転 → 二重フチ → OFF</b> と切り替わります（このページだけ）。OFF のあとは、ページを再読み込みすると元に戻ります。</p>
+      <p class="hint" data-i18n="hint">字幕をタップするとモードが切り替わり、最終的にオフになります。オンにしたいときはページを再読み込みしてください。</p>
       <fieldset>
-        <legend>動作（最初の状態）</legend>
-        <label><input type="radio" name="mode" value="invert" /> <span>反転</span></label>
-        <label><input type="radio" name="mode" value="stroke" /> <span>反転 + 輪郭</span></label>
-        <label><input type="radio" name="mode" value="edge" /> <span>二重フチ</span></label>
+        <legend data-i18n="mode">動作</legend>
+        <label><input type="radio" name="mode" value="invert" /> <span data-i18n="invert">反転</span></label>
+        <label><input type="radio" name="mode" value="stroke" /> <span data-i18n="stroke">反転 + 輪郭</span></label>
+        <label><input type="radio" name="mode" value="edge" /> <span data-i18n="edge">二重フチ</span></label>
       </fieldset>
       <label class="card">
-        <span>字幕サイズ</span>
+        <span data-i18n="size">字幕サイズ</span>
         <select id="fontPct">
           <option value="50">50%</option>
           <option value="75">75%</option>
-          <option value="100">100%（標準）</option>
+          <option value="100" data-i18n="size100">100%（標準）</option>
           <option value="150">150%</option>
           <option value="200">200%</option>
           <option value="300">300%</option>
@@ -157,9 +154,9 @@
         </select>
       </label>
       <label class="card">
-        <span>字幕の高さ</span>
+        <span data-i18n="height">字幕の高さ</span>
         <select id="capPos">
-          <option value="1">1（YouTube標準）</option>
+          <option value="1" data-i18n="pos1">1（YouTube標準）</option>
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4">4</option>
@@ -168,15 +165,15 @@
           <option value="7">7</option>
           <option value="8">8</option>
           <option value="9">9</option>
-          <option value="10">10（いちばん上）</option>
+          <option value="10" data-i18n="pos10">10（いちばん上）</option>
         </select>
       </label>
       <label class="card">
-        <span>中央に寄せる</span>
+        <span data-i18n="center">中央に寄せる</span>
         <input id="center" type="checkbox" />
       </label>
       <label class="card">
-        <span>輪郭の太さ</span>
+        <span data-i18n="width">輪郭の太さ</span>
         <select id="strokeWidth">
           <option value="0">0 px</option>
           <option value="1">1 px</option>

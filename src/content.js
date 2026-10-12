@@ -1,5 +1,5 @@
-/* 字幕の色を反転 Android 版 2.5.0（デスクトップ版 2.4.3 から分岐）
- * - 字幕をタップすると「反転 → 二重フチ → OFF」と切り替わる（このページだけ。再読み込みで保存した動作に戻る）。
+/* 字幕の色を反転 Android 版 2.5.1（デスクトップ版 2.4.3 から分岐）
+ * - 字幕をタップすると「反転 → 反転+輪郭 →（高さを標準へ）→ 二重フチ → OFF」と切り替わる（このページだけ。再読み込みで保存した設定に戻る）。
  * - 反転 / 反転+輪郭 / 二重フチ は CSS（invert.css）で描く。ここではクラスと CSS 変数を切り替えるだけ。
  * - 字幕サイズ: YouTube は .ytp-caption-segment のインライン style に font-size を書き、
  *   プレーヤーのサイズが変わるたびに書き直す。その値を元に倍率をかけて !important で上書きする。
@@ -24,8 +24,8 @@
   const path = location.pathname || "";
   if (isTop ? /^\/live_chat/.test(path) : !/^\/embed\//.test(path)) return;
 
-  if (root.dataset.yticExt === "a250") return;
-  root.dataset.yticExt = "a250";
+  if (root.dataset.yticExt === "a251") return;
+  root.dataset.yticExt = "a251";
 
   const MODES = ["invert", "stroke", "edge"];
   const FONT_STEPS = [50, 75, 100, 150, 200, 300, 400];
@@ -104,6 +104,19 @@
   }
 
   let pageMode = ""; // このページだけの切り替え（"" = 保存した設定のまま）
+  let pagePos = 0; // このページだけの字幕の高さ（0 = 保存した設定のまま）
+  // 表示言語は Firefox（Android）の言語に従う。ja で始まれば日本語、それ以外は英語。
+  const LANG = (() => {
+    try {
+      return /^ja/i.test(chrome.i18n.getUILanguage()) ? "ja" : "en";
+    } catch (e) {
+      return /^ja/i.test(navigator.language || "") ? "ja" : "en";
+    }
+  })();
+  const TOAST_TEXT = {
+    ja: { invert: "反転", stroke: "反転 + 輪郭", pos: "高さ 標準", edge: "二重フチ", off: "OFF" },
+    en: { invert: "Invert", stroke: "Invert + outline", pos: "Height: default", edge: "Double edge", off: "OFF" },
+  }[LANG];
 
   function migrate(data) {
     const fresh = data.settingsRev !== 1;
@@ -216,7 +229,8 @@
     if (centerOn) root.dataset.yticCenter = "1";
     else delete root.dataset.yticCenter;
     // 字幕の高さ。位置は invert.css が YouTube 標準の位置（bottom: 2%）にある枠だけを動かす。
-    const pos = on && state.capPos > 1 ? String(state.capPos) : "";
+    const capPos = pagePos || state.capPos;
+    const pos = on && capPos > 1 ? String(capPos) : "";
     if (pos) {
       if (root.dataset.yticPos !== pos) root.dataset.yticPos = pos;
     } else delete root.dataset.yticPos;
@@ -447,8 +461,7 @@
   const TAP_MOVE = 12;
   const TAP_MS = 600;
   const HIT_PAD = 8; // 字幕の周り 8px もタップ範囲にする（指で押しやすく）
-  const CYCLE = ["invert", "edge", "off"];
-  let gesture = null; // { x, y, t, moved, done, player }
+    let gesture = null; // { x, y, t, moved, done, player }
   let swallowUntil = 0; // この時刻までの互換 mouse/click は字幕操作の続きとして捨てる
 
   function effectiveMode() {
@@ -530,13 +543,28 @@
     if (Date.now() < swallowUntil) swallow(event, true);
   }
 
+  // 反転 → 反転+輪郭 →（高さが標準でなければ）高さを標準(1)へ → 二重フチ → OFF
   function cycleMode(player, x, y) {
     const now = effectiveMode();
-    const index = now === "stroke" ? 0 : CYCLE.indexOf(now);
-    pageMode = CYCLE[(index + 1) % CYCLE.length];
+    let label;
+    if (now === "invert") {
+      pageMode = "stroke";
+      label = "stroke";
+    } else if (now === "stroke" && (pagePos || state.capPos) !== 1) {
+      pageMode = "stroke";
+      pagePos = 1;
+      label = "pos";
+    } else if (now === "stroke") {
+      pageMode = "edge";
+      label = "edge";
+    } else {
+      pageMode = "off";
+      label = "off";
+    }
     apply();
-    toast(player, x, y, pageMode === "invert" ? "反転" : pageMode === "edge" ? "二重フチ" : "OFF");
+    toast(player, x, y, TOAST_TEXT[label]);
   }
+
 
   let toastEl = null;
   let toastTimer = 0;
@@ -587,6 +615,7 @@
     if (area !== "local") return;
     // メニューで「オン/オフ」か「動作」を変えたら、タップで切り替えた状態よりメニューを優先する。
     if (changes.mode || changes.enabled) pageMode = "";
+    if (changes.mode || changes.enabled || changes.capPos) pagePos = 0;
     load(false);
   });
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "android test YouTube inverted color subtitle",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "YouTube字幕を、色反転、輪郭つきの色反転、二重フチで読みやすくします。",
   "browser_specific_settings": {
     "gecko": {
