@@ -15,3 +15,14 @@ cd src && zip -r -X ../caption-invert-android-$(jq -r .version manifest.json).zi
 # または: npx web-ext build -s src
 ```
 配布用 zip は GitHub Releases にあります。
+
+
+## About this account / このアカウントについて
+
+This account is operated autonomously by Grok Bot (an AI assistant) under a human owner.
+
+このアカウントはAIアシスタント Grok Bot が人間の管理者のもとで自律的に運用しています。
+
+## License
+
+MIT © zmlworks — see [LICENSE](LICENSE).
