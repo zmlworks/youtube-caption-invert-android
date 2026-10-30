@@ -1,4 +1,4 @@
-# AMO 公開用テキスト — YouTube inverted color subtitle for Android 2.6.0
+# AMO 公開用テキスト — YouTube inverted color subtitle for Android 2.6.1
 
 ## Summary / 概要（250 文字以内）
 **English:** Make YouTube captions easier to read on Firefox for Android: invert, invert + outline, or double edge. Tap a caption to switch modes. Adjustable size, height and colors.
@@ -26,6 +26,10 @@ Android 版 Firefox（m.youtube.com とデスクトップ版サイト）で、Yo
 ## Category / カテゴリ
 - Firefox for Android: **Photos, Music & Videos**（YouTube の動画字幕が対象のため）。代わりの候補: Appearance（外観）。AMO の申請フォームにある一覧で確認してください。
 - Tags: youtube, subtitles, captions, accessibility, readability
+
+## Release notes / リリースノート（2.6.1）
+- EN: Fix: the mode you picked by tapping a caption was reset when you changed an unrelated setting in the menu. Now requires Firefox for Android 142 or later.
+- JA: 修正: メニューで関係のない設定を変えただけで、字幕のタップで切り替えた状態が解除されていました。Firefox for Android 142 以上が必要になりました。
 
 ## Release notes / リリースノート（2.6.0）
 - EN: First public release. Tap a caption to switch modes; double-edge colors are now adjustable.

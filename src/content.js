@@ -1,4 +1,4 @@
-/* 字幕の色を反転 Android 版 2.6.0（デスクトップ版 2.4.3 から分岐）
+/* 字幕の色を反転 Android 版 2.6.1（デスクトップ版 2.4.3 から分岐）
  * - 字幕をタップすると「反転 → 反転+輪郭 →（高さを標準へ）→ 二重フチ → OFF」と切り替わる（このページだけ。再読み込みで保存した設定に戻る）。
  * - 反転 / 反転+輪郭 / 二重フチ は CSS（invert.css）で描く。ここではクラスと CSS 変数を切り替えるだけ。
  * - 字幕サイズ: YouTube は .ytp-caption-segment のインライン style に font-size を書き、
@@ -615,8 +615,11 @@
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local") return;
     // メニューで「オン/オフ」か「動作」を変えたら、タップで切り替えた状態よりメニューを優先する。
-    if (changes.mode || changes.enabled) pageMode = "";
-    if (changes.mode || changes.enabled || changes.capPos) pagePos = 0;
+    // 2.6.1: 値が実際に変わったときだけ（メニューは毎回全項目を保存するので、他の項目を変えただけで解除しない）。
+    const changed = (c) => !!c && JSON.stringify(c.oldValue) !== JSON.stringify(c.newValue);
+    const modeChanged = changed(changes.mode) || changed(changes.enabled);
+    if (modeChanged) pageMode = "";
+    if (modeChanged || changed(changes.capPos)) pagePos = 0;
     load(false);
   });
 
