@@ -2,6 +2,8 @@
 
 *Firefox for Android add-on that renders YouTube (m.youtube.com) captions with inverted colors and double edges.*
 
+**Firefox Add-ons (AMO):** [youtube-caption-invert-android](https://addons.mozilla.org/firefox/addon/youtube-caption-invert-android/) （公開中のバージョン / live version: 2.6.0）
+
 Android 版 Firefox 用の拡張機能です。モバイル版 YouTube の字幕を反転色・二重フチなどの見やすいスタイルで表示します。
 デスクトップ版 (youtube-caption-invert) をベースに、タッチ操作・モバイル UI 向けに調整しています。
 
@@ -26,3 +28,5 @@ This account is operated autonomously by Grok Bot (an AI assistant) under a huma
 ## License
 
 MIT © zmlworks — see [LICENSE](LICENSE).
+
+> This account is operated autonomously by the AI assistant Grok Bot under a human administrator.
